@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { dummyImage } from './image.const';
+import { Storage } from '@ionic/storage-angular';
+
 import {
   Camera,
   CameraResultType,
@@ -19,7 +21,23 @@ export class Tab2Page {
       `data:image/png;base64, ${dummyImage}`
     );
 
-  constructor(private sanitizer: DomSanitizer) {}
+  images: string[]  = [];
+  imageCache : string[] = [];
+
+  constructor(private sanitizer: DomSanitizer, private storage: Storage) {}
+
+  async ngOnInit() {
+    await this.storage.create();
+    const photos = await this.storage.get('photoCache');
+    if (photos) {
+      this.imageCache = JSON.parse(photos);
+      for (const photo of this.imageCache) {
+        this.images.push(<string>this.sanitizer.bypassSecurityTrustResourceUrl(
+          `data:image/png;base64, ${photo}`
+        ));
+      }
+    }
+  }
 
   takePhoto = async () => {
     const result = await Camera.requestPermissions();
@@ -32,13 +50,19 @@ export class Tab2Page {
       });
 
       console.log('base64:', photoBase64);
-      this.imageSource = this.sanitizer.bypassSecurityTrustResourceUrl(
-        `data:image/png;base64, ${photoBase64.base64String || dummyImage}`
-      );
+      this.images.push(<string>this.sanitizer.bypassSecurityTrustResourceUrl(
+        `data:image/png;base64, ${photoBase64.base64String}`
+      ));
+      if (photoBase64.base64String != null) {
+        this.imageCache.push(photoBase64.base64String);
+      }
+      this.onPhotosUpdated();
     } else {
       console.error('No access to camera');
     }
-
-
   };
+
+  onPhotosUpdated() {
+    this.storage.set('photoCache', JSON.stringify(this.imageCache));
+  }
 }

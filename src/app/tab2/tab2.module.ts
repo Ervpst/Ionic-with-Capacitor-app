@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Tab2Page } from './tab2.page';
 import { ExploreContainerComponentModule } from '../explore-container/explore-container.module';
+import { Drivers } from '@ionic/storage';
+import { IonicStorageModule } from '@ionic/storage-angular';
 
 import { Tab2PageRoutingModule } from './tab2-routing.module';
 
@@ -13,7 +15,11 @@ import { Tab2PageRoutingModule } from './tab2-routing.module';
     CommonModule,
     FormsModule,
     ExploreContainerComponentModule,
-    Tab2PageRoutingModule
+    Tab2PageRoutingModule,
+    IonicStorageModule.forRoot({
+      name: '__mydb',
+      driverOrder: [Drivers.IndexedDB, Drivers.LocalStorage]
+    })
   ],
   declarations: [Tab2Page]
 })

@@ -11,11 +11,11 @@
     </ion-toolbar>
   </ion-header>
 
-  <app-explore-container name="Tab 2 page"></app-explore-container>
+  <app-explore-container></app-explore-container>
   <div id="container">
-    <img [src]="imageSource" alt="Image Source" height="300" width="300" />
     <p class="askPermissionCont last">
       <ion-button expand="block" (click)="takePhoto()">Tee pilt</ion-button>
     </p>
+      <img *ngFor="let image of images" [src]="image" alt="Image Source" height="300" width="300" />
   </div>
 </ion-content>
